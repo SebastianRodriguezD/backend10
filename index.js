@@ -12,7 +12,7 @@ connectDB()
 app.use(
   cors({
     origin:
-      'https://epoca-fest-sebastianrodriguezd-sebastianrodriguezds-projects.vercel.app/'
+      'https://epoca-fest-sebastianrodriguezd-sebastianrodriguezds-projects.vercel.app'
   })
 )
 app.use('/api/v1/eventos', eventosRouters)
