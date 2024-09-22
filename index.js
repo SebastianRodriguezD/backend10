@@ -11,7 +11,8 @@ app.use(express.json())
 connectDB()
 app.use(
   cors({
-    origin: 'http://localhost:5173'
+    origin:
+      'https://epoca-fest-sebastianrodriguezd-sebastianrodriguezds-projects.vercel.app/'
   })
 )
 app.use('/api/v1/eventos', eventosRouters)
