@@ -11,7 +11,8 @@ app.use(express.json())
 connectDB()
 app.use(
   cors({
-    origin: 'https://epoca-fest.netlify.app/'
+    origin: 'https://epoca-fest.netlify.app',
+    credentials: true
   })
 )
 app.use('/api/v1/eventos', eventosRouters)
