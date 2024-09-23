@@ -11,8 +11,7 @@ app.use(express.json())
 connectDB()
 app.use(
   cors({
-    origin:
-      'https://epoca-fest-sebastianrodriguezd-sebastianrodriguezds-projects.vercel.app'
+    origin: 'https://epoca-fest.netlify.app/'
   })
 )
 app.use('/api/v1/eventos', eventosRouters)
