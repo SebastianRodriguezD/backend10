@@ -1,4 +1,5 @@
 const { generarLlave } = require('../../utils/jwt')
+const Evento = require('../models/eventos')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 
@@ -87,11 +88,97 @@ const updateUser = async (req, res, next) => {
     return res.status(400).json('error')
   }
 }
+const addFavoriteEvent = async (req, res, next) => {
+  const { userId, eventId } = req.params
+
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' })
+    }
+
+    if (user.favoritos.includes(eventId)) {
+      return res.status(400).json({ message: 'El evento ya está en favoritos' })
+    }
+
+    const event = await Evento.findById(eventId)
+    if (!event) {
+      return res.status(404).json({ message: 'Evento no encontrado' })
+    }
+
+    user.favoritos.push(eventId)
+    await User.findByIdAndUpdate(
+      userId,
+      { favoritos: user.favoritos },
+      { new: true }
+    )
+
+    res.status(200).json({
+      message: 'Asistencia confirmada y evento agregado a favoritos',
+      favoritos: user.favoritos
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Error al confirmar asistencia', error })
+  }
+}
+const removeFavoriteEvent = async (req, res, next) => {
+  const { userId, eventId } = req.params
+
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' })
+    }
+
+    if (!user.favoritos.includes(eventId)) {
+      return res
+        .status(200)
+        .json({ message: 'El evento ya no estaba en favoritos' })
+    }
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { favoritos: eventId } },
+      { new: true }
+    )
+
+    return res.status(200).json({
+      message: 'Evento eliminado de favoritos',
+      favoritos: user.favoritos.filter((id) => id !== eventId)
+    })
+  } catch (error) {
+    console.error('Error al eliminar el evento de favoritos:', error)
+    return res
+      .status(500)
+      .json({ message: 'Error al eliminar el evento de favoritos' })
+  }
+}
+
+const getFavoritos = async (req, res) => {
+  const { userId } = req.params
+
+  try {
+    const user = await User.findById(userId).select('favoritos')
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' })
+    }
+
+    return res.status(200).json(user.favoritos)
+  } catch (error) {
+    console.error('Error al obtener favoritos:', error)
+    return res.status(500).json({ message: 'Error en el servidor' })
+  }
+}
 
 module.exports = {
   getUsers,
   getUserById,
   register,
   updateUser,
-  login
+  login,
+  addFavoriteEvent,
+  removeFavoriteEvent,
+  getFavoritos
 }
